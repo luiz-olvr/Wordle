@@ -1,0 +1,2 @@
+# Wordle
+ Jogo Wordle
