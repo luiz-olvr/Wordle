@@ -1,2 +1,2 @@
 # Wordle
- Jogo Wordle
+ Replica do Jogo Wordld feito em C, essa replica conta com apenas uma palavra, mas pode facilmente ser adaptada para um banco de palavras e assim ter variadades ![alt](https://www.google.com/imgres?q=wordle&imgurl=https%3A%2F%2Fwww.nme.com%2Fwp-content%2Fuploads%2F2023%2F10%2FWordle-credit-Jakub-PorzyckiNurPhoto-via-Getty%402000x1270.jpg&imgrefurl=https%3A%2F%2Fwww.nme.com%2Fguides%2Fgaming-guides%2Fheres-the-wordle-answer-for-today-3171240&docid=l8nUDCGgGpd58M&tbnid=GiBs6avdbUSxUM&vet=12ahUKEwjTuoq11aSGAxVVqZUCHSxQBWo4ChAzegQIGhAA..i&w=2000&h=1270&hcb=2&ved=2ahUKEwjTuoq11aSGAxVVqZUCHSxQBWo4ChAzegQIGhAA)
