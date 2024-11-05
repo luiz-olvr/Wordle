@@ -1,68 +1,102 @@
-#include <stdio.h>
-#include <string.h>
+#include <Wire.h> 
+#include <Adafruit_GFX.h> 
+#include <Adafruit_SSD1306.h> 
+Adafruit_SSD1306 display = Adafruit_SSD1306();
 
+const int LM35 = A2;
+float media = 0;
+float temperatura;
+int setTemp = 0, Aument = 13, Dimin = 10, estadorele = 8, buttonState = 0, ganho = 5, pot = 0;
 
-#define TAMANHO_PALAVRA 5
-#define MAX_TENTATIVAS 6
-
-//Variáveis globais de controle
-char palavraChave [5]= "audio";
-char tentativa[TAMANHO_PALAVRA];
-int tentativas = 0;
-int err = 0;
-int tent = 1;
-
-int main(void)
-{
-    printf("Bem-vindo ao Wordle (Termo)!\n");
-    while(tent == 1){
-    
-    while(tentativas < MAX_TENTATIVAS) {
-        printf("\n\nTentativa %d de %d\n", tentativas + 1, MAX_TENTATIVAS);
-        printf("Digite sua palavra: ");
-        scanf("%s", tentativa);
-        
-        //verificar se a palavra é igual ou Não
-        
-        if(strcmp(tentativa,palavraChave) == 0){
-            break;
-        }
-        
-        
-        printf("\nSua tentavia foi: %s\n", tentativa);
-        printf("\nSeus acertos foram: ");
-        
-
-        // Implementar a lógica de verificação da tentativa aqui
-        
-         for (int i = 0; i < TAMANHO_PALAVRA; i++) {
-            err = 0;
-            for(int j = 0; j < TAMANHO_PALAVRA; j++){
-                if (tentativa[i] == palavraChave[j] && i == j) {
-                    printf("*");}
-            
-                if(tentativa[i] == palavraChave[j] && i != j){
-                    printf("+");}
-
-                if(tentativa[i] != palavraChave[j] && i == j && err == 0){
-                    printf("X");
-                    err = 1;}
-            }
-        }
-        
-        tentativas++;
-    }
-
-   if(strcmp(tentativa,palavraChave) == 0){ 
-        printf("\nMeus parabens, voce acertou\nA palavra era %s\n", palavraChave);}
-    else{
-        printf("\nInfelizmente suas chances acabaram, voce perdeu\nA palavra era %s\n",palavraChave);}
-    printf("\n\nQuer jogar novamente? \n[1] Sim\n[0] Não");
-    scanf("%d", &tent);
-    if (tent == 1){tentativas = 0;}
-    else{
-        printf("\nObrigado por jogar, volte sempre!!\n");
-    }
+void setup() {
+pinMode(Aument, INPUT_PULLUP);
+pinMode(estadorele, OUTPUT);
+pinMode(Dimin, INPUT_PULLUP);
+Serial.begin(9600);
+Wire.begin();
+display.clearDisplay();
+display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+display.setTextColor(WHITE);
+display.setTextSize(3);
 }
-    return 0;
+// Função para mostrar a tela
+void mostraTela(){
+Serial.print("Valor na tela: ");
+Serial.println(setTemp);
+display.setCursor(10,10);
+display.print(setTemp); // mostra na tela a temperatura que o usuario escolheu
+display.setTextSize(1);
+display.print(" O ");
+display.setTextSize(3);
+display.print("C");
+display.display(); // faz a escrita no display
+display.clearDisplay();
+}
+// Função para setar a temperatura
+void SetarTemp(){
+// Para aumentar a temperatura
+buttonState = digitalRead(Aument);
+if(buttonState == LOW){
+setTemp++;
+Serial.println("botao de aumentar apertado");
+}
+// Para diminuir a temperatura
+buttonState = digitalRead(Dimin);
+if(buttonState == LOW){
+setTemp--;
+Serial.println("botao de diminuir apertado");
+}
+
+}
+// Função para impor limite na temperatura e verificar se pode ou não ligar a P.P.
+
+
+void ligaResis(){
+
+pot = (setTemp - temperatura) * ganho;
+Serial.print("Potencia calculo: ");
+Serial.println(pot);
+
+if(pot >= 255){
+analogWrite(estadorele, 255);
+Serial.print("Potencia no led: ");
+Serial.println('255');
+
+}
+
+
+if(pot > 0 && pot < 255){
+analogWrite(estadorele, pot);
+Serial.print("Potencia no led: ");
+Serial.println(pot);
+}
+if(pot <=0){
+analogWrite(estadorele, 0);
+Serial.print("Potencia no led: ");
+Serial.println('0');
+}
+
+
+
+}
+
+
+void loop() {
+
+media = 0;
+for(int c = 0; c<=50; c++){
+
+  media = media + (((analogRead(LM35)*5.0)/1023)/0.01);
+
+}
+temperatura = media / 50;
+Serial.print("Temperatura: ");
+Serial.println(temperatura);
+
+//condRele();
+ligaResis();
+SetarTemp();
+
+mostraTela();
+
 }
